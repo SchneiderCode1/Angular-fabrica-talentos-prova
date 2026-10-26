@@ -1,0 +1,56 @@
+
+.body {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    z-index: 0;
+}
+
+.main {
+    display: flex;
+    flex-direction: column;
+    padding-left: 9%;
+    padding-right: 9%;
+    border-radius: 10px;
+    background-color: antiquewhite;
+    height: 100vh;
+
+}
+
+.container_main_header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 50%;
+}
+
+.container_main_title {
+    display: flex;
+    gap: 5%;
+}
+
+.container_subscription_counter {
+    display: flex;
+    gap: 15%;
+}
+
+.button_subscription {
+    white-space: nowrap;
+}
+
+.container_subtitle {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.container_subscriptions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.modal_subscription {
+    display: flex;
+    border-radius: 15px;
+}

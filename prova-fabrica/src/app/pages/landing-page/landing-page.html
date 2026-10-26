@@ -1,0 +1,45 @@
+@if (modalOpened()) {
+    <app-subscription-modal></app-subscription-modal>
+}
+
+<div class="body">
+    <app-header></app-header>
+
+    <main class="main">
+        <div class="container_main_header">
+            <div class="container_main_title">
+                <h1>Inscrições</h1>
+                <div class="container_subtitle">
+                    <img alt="imagem"/>
+                    <p style="white-space: nowrap;">Segunda-Feira, 14/12/2050</p>
+                </div>
+            </div>
+            
+            <div class="container_subscription_counter">
+                <p>5km</p>
+                <p>10km</p>
+
+                <button class="button_subscription" (click)="openModal()">
+                    + Nova Inscrição
+                </button>
+            </div>
+
+        </div>
+        
+
+        <div class="container_subscriptions">
+            @for (i of list; track i) {
+            
+                <app-subs-database></app-subs-database>
+            
+            }
+        </div>
+            
+        
+    </main>
+
+
+    <app-footer></app-footer>
+</div>
+
+

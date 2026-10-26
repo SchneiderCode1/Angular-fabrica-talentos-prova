@@ -1,0 +1,14 @@
+.dark_overlay {
+    background-color: black;
+    opacity: 10;
+    z-index: 1;
+}
+.container_modal {
+    background-color: purple;
+    z-index: 2;
+    justify-items: center;
+    align-content: center;
+}
+.container_form {
+    padding: 1%;
+}
