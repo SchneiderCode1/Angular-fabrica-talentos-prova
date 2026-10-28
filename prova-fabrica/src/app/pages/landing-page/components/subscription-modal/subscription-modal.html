@@ -3,20 +3,35 @@
     <h1>Nova Inscrição</h1>
     <p>Todos os campos são obrigatórios.</p>
     <div class="container_form">
-        <form>
-            <p>Nome Completo</p>
-            <input type="text" placeholder="Ex.: Seu Nome Aqui">
-            <p>E-mail</p>
-            <input type="text" placeholder="Seu Nome Aqui">
-            
-            <div>
-                <p>Data de Nascimento</p>
-                <input type="text" placeholder="dd / mm / aaaa">
-                <p>Percurso</p>
-                <input type="text" placeholder="Selecione o percurso">
+        <form [formGroup]="form" (ngSubmit)="injectInfo()">
+            <label for="username">Nome Completo</label>
+            <input id="username" type="text" formControlName="username" placeholder="Ex.: Seu Nome Aqui">
+            @if (erro('username'); as mensagem) { <small class="erro_campo">{{ mensagem }}</small> }
+
+            <label for="email">E-mail</label>
+            <input id="email" type="email" formControlName="email" placeholder="email@exemplo.com">
+            @if (erro('email'); as mensagem) { <small class="erro_campo">{{ mensagem }}</small> }
+
+            <div class="container_form_date">
+                <label for="birthdate">Data de Nascimento</label>
+                <input id="birthdate" type="date" formControlName="birthdate">
+                @if (erro('birthdate'); as mensagem) { <small class="erro_campo">{{ mensagem }}</small> }
+
+                <label for="race_length">Percurso</label>
+                <select id="race_length" formControlName="race_length">
+                    <option value="" disabled>Selecione o percurso</option>
+                    <option value="KM_5">5 km</option>
+                    <option value="KM_10">10 km</option>
+                </select>
+                @if (erro('race_length'); as mensagem) { <small class="erro_campo">{{ mensagem }}</small> }
             </div>
+            @if (recusa(); as mensagem) {
+                <p class="erro_regulamento" role="alert">{{ mensagem }}</p>
+            }
 
+            <button type="submit">
+                Enviar
+            </button>
         </form>
-
     </div>
 </div>

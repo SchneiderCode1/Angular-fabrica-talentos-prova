@@ -1,37 +1,49 @@
-
 .body {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    z-index: 0;
+    padding: 0.5rem;
 }
 
 .main {
     display: flex;
     flex-direction: column;
-    padding-left: 9%;
-    padding-right: 9%;
+    gap: 1rem;
+    padding: 1rem;
     border-radius: 10px;
     background-color: antiquewhite;
-    height: 100vh;
-
+    min-height: 100vh;
 }
 
 .container_main_header {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    justify-content: center;
-    gap: 50%;
+    justify-content: space-between;
+    gap: 1rem;
 }
 
 .container_main_title {
     display: flex;
-    gap: 5%;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 1.5rem;
+}
+
+.container_main_header p {
+    margin: 0;
+}
+
+.container_main_title h1 {
+    margin: 0;
+    font-size: clamp(1.5rem, 5vw, 2rem);
 }
 
 .container_subscription_counter {
     display: flex;
-    gap: 15%;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.5rem;
 }
 
 .button_subscription {
@@ -46,11 +58,55 @@
 
 .container_subscriptions {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr;
     gap: 1rem;
 }
 
 .modal_subscription {
     display: flex;
     border-radius: 15px;
+}
+
+.container_subscription {
+    background-color: aliceblue;
+    padding: 1%;
+}
+.container_details {
+    display: flex;
+    gap: 5%;
+}
+
+@media (max-width: 599px) {
+    .container_subscription_counter {
+        width: 100%;
+    }
+
+    .button_subscription {
+        flex: 1 0 100%;
+        padding: 0.75rem;
+    }
+}
+
+@media (min-width: 600px) {
+    .body {
+        padding: 1rem;
+    }
+
+    .main {
+        padding: 1.5rem 5%;
+    }
+
+    .container_subscriptions {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .main {
+        padding: 2rem 9%;
+    }
+
+    .container_subscriptions {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }

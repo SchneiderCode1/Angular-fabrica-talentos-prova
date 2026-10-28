@@ -1,5 +1,5 @@
 @if (modalOpened()) {
-    <app-subscription-modal></app-subscription-modal>
+    <app-subscription-modal (fechar)="closeModal()"></app-subscription-modal>
 }
 
 <div class="body">
@@ -16,8 +16,9 @@
             </div>
             
             <div class="container_subscription_counter">
-                <p>5km</p>
-                <p>10km</p>
+                <p>Total: {{ localStorageService.total() }}</p>
+                <p>5 km: {{ localStorageService.total5km() }}</p>
+                <p>10 km: {{ localStorageService.total10km() }}</p>
 
                 <button class="button_subscription" (click)="openModal()">
                     + Nova Inscrição
@@ -28,18 +29,35 @@
         
 
         <div class="container_subscriptions">
-            @for (i of list; track i) {
-            
-                <app-subs-database></app-subs-database>
-            
+            @for (inscricao of localStorageService.subscriptions(); track inscricao.email) {
+                <div class="container_subscription">
+                    <h2>{{inscricao.username}}</h2>
+                    <p>{{inscricao.email}}</p>
+                    <h3>{{ formatarDataBr(inscricao.birthdate) }}</h3>
+                    @let avaliacao = avaliar(inscricao);
+                    <div>
+                        <p>{{inscricao.race_length === 'KM_5' ? '5 km' : '10 km'}}</p>
+                        <p>{{ avaliacao.idadeNaProva }} anos na prova</p>
+                        @if (avaliacao.categoria; as categoria) {
+                            <span class="tag tag_{{ categoria.toLowerCase() }}">{{ rotuloCategoria[categoria] }}</span>
+                        }
+                    </div>
+                    
+
+                    <div class="container_details">
+                        <a [routerLink]="['/inscricoes', inscricao.email]">Detalhes</a>
+                        <button type="button" (click)="localStorageService.remove(inscricao.email)">Cancelar inscrição</button>
+                    </div>
+
+                </div>
+            } @empty {
+                <p>Nenhuma inscrição ainda.</p>
             }
         </div>
             
         
     </main>
 
-
     <app-footer></app-footer>
 </div>
-
 
