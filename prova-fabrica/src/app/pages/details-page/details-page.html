@@ -1,0 +1,52 @@
+<div class="body">
+    <app-header></app-header>
+
+    <main class="main">
+        <a class="voltar" routerLink="/inscricoes">← Voltar à lista</a>
+
+        @if (localStorageService.error(); as mensagem) {
+            <p class="aviso" role="alert">{{ mensagem }}</p>
+        }
+
+        @if (inscricao(); as inscricao) {
+            <article class="container_detalhes">
+                <h1>{{ inscricao.username }}</h1>
+
+                <dl class="dados">
+                    <dt>E-mail</dt>
+                    <dd>{{ inscricao.email }}</dd>
+
+                    <dt>Data de nascimento</dt>
+                    <dd>{{ formatarDataBr(inscricao.birthdate) }}</dd>
+
+                    @if (avaliacao(); as avaliacao) {
+                        <dt>Idade na prova</dt>
+                        <dd>{{ avaliacao.idadeNaProva }} anos</dd>
+
+                        <dt>Categoria</dt>
+                        <dd>
+                            @if (avaliacao.categoria; as categoria) {
+                                <span class="tag tag_{{ categoria.toLowerCase() }}">{{ rotuloCategoria[categoria] }}</span>
+                            }
+                        </dd>
+                    }
+
+                    <dt>Percurso</dt>
+                    <dd>{{ inscricao.race_length === 'KM_5' ? '5 km' : '10 km' }}</dd>
+                </dl>
+
+                <div class="acoes">
+                    <button type="button" (click)="cancelar(inscricao.email)">Cancelar inscrição</button>
+                </div>
+            </article>
+        } @else {
+            <section class="nao_encontrada">
+                <h1>Inscrição não encontrada</h1>
+                <p>Não existe inscrição para o e-mail <strong>{{ email() }}</strong>.</p>
+                <a routerLink="/inscricoes">Voltar à lista</a>
+            </section>
+        }
+    </main>
+
+    <app-footer></app-footer>
+</div>

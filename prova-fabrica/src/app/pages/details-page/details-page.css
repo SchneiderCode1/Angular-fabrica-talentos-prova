@@ -1,0 +1,92 @@
+.body {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 0.5rem;
+}
+
+.main {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 10px;
+    background-color: antiquewhite;
+    min-height: 60vh;
+}
+
+.voltar {
+    align-self: flex-start;
+}
+
+.aviso {
+    margin: 0;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    background-color: #fdecea;
+    color: #8a1c13;
+    font-weight: 600;
+}
+
+.container_detalhes,
+.nao_encontrada {
+    background-color: aliceblue;
+    border-radius: 15px;
+    padding: 1.25rem;
+    max-width: 640px;
+}
+
+.container_detalhes h1,
+.nao_encontrada h1 {
+    margin: 0 0 1rem;
+    font-size: clamp(1.4rem, 5vw, 2rem);
+    overflow-wrap: anywhere;
+}
+
+.dados {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.25rem 1rem;
+    margin: 0;
+}
+
+.dados dt {
+    font-weight: 700;
+    margin-top: 0.5rem;
+}
+
+.dados dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+.acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+@media (min-width: 600px) {
+    .body {
+        padding: 1rem;
+    }
+
+    .main {
+        padding: 1.5rem 5%;
+    }
+
+    .dados {
+        grid-template-columns: max-content 1fr;
+    }
+
+    .dados dt {
+        margin-top: 0;
+    }
+}
+
+@media (min-width: 1024px) {
+    .main {
+        padding: 2rem 9%;
+    }
+}
