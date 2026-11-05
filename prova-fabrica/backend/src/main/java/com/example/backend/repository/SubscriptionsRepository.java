@@ -33,7 +33,4 @@ public class SubscriptionsRepository {
     public synchronized boolean remove(String email) {
         return subscriptions.remove(email)!= null;
     }
-
-    
-    
 }
