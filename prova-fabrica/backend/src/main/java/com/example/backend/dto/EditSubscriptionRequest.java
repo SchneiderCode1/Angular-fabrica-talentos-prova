@@ -1,6 +1,6 @@
 package com.example.backend.dto;
 
-import org.hibernate.validator.constraints.Length;
+import com.example.backend.domain.Length;
 
 import java.time.LocalDate;
 
@@ -14,7 +14,7 @@ public record EditSubscriptionRequest(
 
     @NotNull (message = "o campo de data de nascimento é obrigatório durante a edição")
     @Past (message = "A data de nascimento deve ser anterior a hoje")
-    LocalDate birDate,
+    LocalDate birthDate,
 
     @NotNull (message = "O campo de percurso é obrigatório durante a edição")
     Length length

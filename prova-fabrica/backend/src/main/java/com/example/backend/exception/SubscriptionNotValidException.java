@@ -3,7 +3,7 @@ package com.example.backend.exception;
 import com.example.backend.domain.RegulamentException;
 
 public class SubscriptionNotValidException extends RuntimeException {
-    public SubscriptionNotValidException() {
+    public SubscriptionNotValidException(String string) {
         super("A inscrição está inválida procurando um erro apropriado...");
     }
 
