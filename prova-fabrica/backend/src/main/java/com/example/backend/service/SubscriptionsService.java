@@ -1,6 +1,7 @@
 package com.example.backend.service;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import com.example.backend.domain.Length;
@@ -10,6 +11,7 @@ import com.example.backend.domain.SubscriptionEval;
 import com.example.backend.domain.SubscriptionRules;
 import com.example.backend.domain.Subscriptions;
 import com.example.backend.dto.EditSubscriptionRequest;
+import com.example.backend.dto.ShortResponse;
 import com.example.backend.dto.SubscriptionRequest;
 import com.example.backend.dto.SubscriptionResponse;
 import com.example.backend.exception.SubscriptionEmailAlreadyExistsException;
@@ -45,10 +47,25 @@ public class SubscriptionsService {
         return transformToResponse(subscription);
     }
 
-    // public List<SubscriptionResponse> list() {
-    //         return repository.list().stream().map(this::transformToResponse).toList();
+    public List<SubscriptionResponse> list() {
+        return repository.list().stream()
+                .map(this::transformToResponse)
+                .toList();
+    }
 
-    // }
+    public void cancel(String email) {
+        String normalizedEmail = SubscriptionRules.normalizeEmail(email);
+        if (!repository.remove(normalizedEmail)) {
+            throw new SubscriptionNotFoundException(normalizedEmail);
+        }
+    }
+
+    public ShortResponse summary() {
+        List<Subscriptions> subscriptions = repository.list();
+        long km5 = subscriptions.stream().filter(s -> s.length() == Length.KM_05).count();
+        long km10 = subscriptions.stream().filter(s -> s.length() == Length.KM_10).count();
+        return new ShortResponse(subscriptions.size(), km5, km10);
+    }
 
     public SubscriptionResponse check(String email) {
         return transformToResponse(searchExistent(email));

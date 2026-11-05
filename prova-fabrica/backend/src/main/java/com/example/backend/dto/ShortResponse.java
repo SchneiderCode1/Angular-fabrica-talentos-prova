@@ -1,4 +1,7 @@
 package com.example.backend.dto;
 
-public record ShortResponse(long total, long km5, long km10) {
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public record ShortResponse(
+    @JsonProperty ("resumo") long total, long km5, long km10) { // Esse resumo está faltando até eu descobrir como utilizar List<Subscription>
 }

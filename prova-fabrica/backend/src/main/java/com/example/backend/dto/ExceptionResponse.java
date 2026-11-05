@@ -1,4 +1,8 @@
 package com.example.backend.dto;
 
-public record ExceptionResponse(String message) {
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public record ExceptionResponse(
+    @JsonProperty  ("mensagem") String message
+) {
 }
