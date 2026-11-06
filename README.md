@@ -1,121 +1,155 @@
-# Corrida Solidária da Vila Esperança — Inscrições
+# Corrida Solidária — API de Inscrições
 
-Aplicação Angular para cadastrar, listar, consultar, editar e cancelar inscrições da 5ª Corrida Solidária, com resumo do total de inscritos e da quantidade por percurso.
+API REST para cadastrar, listar, consultar, editar e cancelar inscrições da **5ª Corrida Solidária da Vila Esperança**, com o resumo do total de inscritos e da quantidade por percurso. Idade na prova e categoria são sempre calculadas pelo sistema, conforme o regulamento oficial.
 
-## Como rodar
+## Requisitos
 
-**Pré-requisitos:** Node 22 e npm (ambiente de referência do enunciado).
+- **JDK 21**
+- Não é necessário instalar o Maven: o projeto usa o Maven Wrapper (`mvnw`).
 
-```bash
-cd prova-fabrica
-npm ci          # instala as dependências exatas do package-lock.json
-npm start       # sobe o servidor de desenvolvimento (ng serve)
-```
+## Como executar
 
-Abra `http://localhost:4200`. O endereço `/` redireciona para `/inscricoes`.
-
-Outros comandos:
+Na pasta `backend`:
 
 ```bash
-npm test        # testes (Vitest)
-npm run build   # build de produção em dist/
+# Linux, macOS ou Git Bash
+./mvnw spring-boot:run
+
+# Windows (PowerShell)
+.\mvnw spring-boot:run
 ```
 
-Os dados ficam no `localStorage` do navegador, na chave `corrida.inscricoes.v1`. A aplicação começa com a lista vazia. Para zerar os dados: DevTools (F12) → Application → Local Storage → apagar a chave.
+A API sobe em **http://localhost:8080**. Os dados ficam em memória: a aplicação começa com a lista vazia, e as inscrições são perdidas ao reiniciar.
 
-## Entendimento do problema
+## Como rodar os testes
 
-A associação organiza a corrida e precisa substituir o caderno e a planilha por um sistema simples de inscrições.
-Cada inscrição tem nome, e-mail, data de nascimento e percurso (5 km ou 10 km); o e-mail identifica a pessoa e só pode ser usado uma vez.
-O sistema calcula a idade na data da prova e a categoria, recusando quem não cumpre o regulamento (mínimo de 14 anos; 10 km só a partir de 18).
-A organização precisa ver o total de inscritos e por percurso, para encomendar medalhas e água.
-Também precisa corrigir nome, nascimento e percurso sem cancelar a inscrição, e abrir uma inscrição específica por link.
+```bash
+./mvnw test
+```
 
-## Regras e suas fontes
+### Observação sobre os testes:
+Os testes automatizados não foram realizados, foram realizados **apenas** testes manualmente pela ferramenta Postman.
 
-O regulamento oficial (Peça 2 do pacote do cliente) prevalece sobre o áudio e as mensagens.
+## Contrato da API
+
+Prefixo `/api`. Corpos e respostas em JSON.
+
+| Operação  | Rota                              | Corpo                                          | Sucesso                 | Recusas  |
+|-----------|-----------------------------------|------------------------------------------------|-------------------------|----------|
+| Cadastrar | `POST /api/inscricoes`            | `nome`, `email`, `dataNascimento`, `percurso`  | `201` + inscrição       | 400, 409 |
+| Listar    | `GET /api/inscricoes`             | —                                              | `200`, ordem de cadastro| —        |
+| Consultar | `GET /api/inscricoes/{email}`     | —                                              | `200` + inscrição       | 404      |
+| Editar    | `PUT /api/inscricoes/{email}`     | `nome`, `dataNascimento`, `percurso`           | `200` + inscrição       | 400, 404 |
+| Cancelar  | `DELETE /api/inscricoes/{email}`  | —                                              | `204`, sem corpo        | 404      |
+| Resumo    | `GET /api/inscricoes/resumo`      | —                                              | `200`                   | —        |
+
+**Inscrição**
+
+```json
+{
+  "nome": "Ana Souza",
+  "email": "ana.souza@email.com",
+  "dataNascimento": "1990-05-20",
+  "percurso": "KM_10",
+  "idadeNaProva": 36,
+  "categoria": "ADULTO"
+}
+```
+
+**Resumo**
+
+```json
+{ "total": 3, "km5": 2, "km10": 1 }
+```
+
+**Recusa** (toda resposta de erro)
+
+```json
+{ "mensagem": "A idade mínima para participar é: 14 anos." }
+```
+
+| Status | Quando |
+|--------|--------|
+| 400 | Campo ausente; nome ou e-mail fora do formato; data inexistente, fora do formato `aaaa-mm-dd` ou não anterior a hoje; percurso diferente de `KM_5`/`KM_10`; JSON malformado; menos de 14 anos na data da prova; 10 km com menos de 18 anos |
+| 404 | Não existe inscrição ativa para o e-mail informado |
+| 409 | O e-mail já tem inscrição ativa (somente no cadastro) |
+
+### Exemplo rápido
+
+```bash
+curl -X POST http://localhost:8080/api/inscricoes \
+  -H "Content-Type: application/json" \
+  -d '{"nome":"Ana Souza","email":"ana.souza@email.com","dataNascimento":"1990-05-20","percurso":"KM_10"}'
+
+curl http://localhost:8080/api/inscricoes
+curl http://localhost:8080/api/inscricoes/resumo
+```
+
+No PowerShell, use `curl.exe` em vez de `curl`.
+
+## Regras implementadas e fontes
 
 | Regra | Fonte |
-|---|---|
-| Inscrição individual com nome completo, e-mail, data de nascimento e percurso | Regulamento, Art. 4º, I |
-| O e-mail identifica a inscrição; não há duas inscrições com o mesmo e-mail | Regulamento, Art. 4º, II |
-| Inscrição gratuita, mediante doação de 1 kg de alimento na retirada do kit | Regulamento, Art. 4º, III |
-| Prova em 14/03/2027 | Regulamento, Art. 5º, I |
-| Percursos de 5 km e 10 km | Regulamento, Art. 5º, II |
-| Vale a idade completa na data da prova (aniversário no próprio dia já conta) | Regulamento, Art. 6º, I; enunciado |
-| Idade mínima de 14 anos | Regulamento, Art. 6º, II |
-| 10 km só para 18 anos ou mais | Regulamento, Art. 6º, III |
-| Idade mínima é verificada antes da restrição dos 10 km | Enunciado |
-| Categorias: Juvenil 14–17, Adulto 18–39, Master 40–59, Sênior 60+ | Regulamento, Art. 6º, IV |
-| Cancelamento pelo e-mail, a qualquer momento antes da prova; o e-mail fica livre para nova inscrição | Regulamento, Art. 7º |
-| Edição de nome, nascimento e percurso; e-mail imutável (para trocar, cancela e inscreve de novo) | Atualização do pedido (19/10/2026) |
-| Nome: 3 a 100 caracteres após remover espaços nas pontas e reduzir espaços internos repetidos; aceita acentos, apóstrofos e hífens | Enunciado |
-| E-mail: espaços das pontas removidos e convertido para minúsculas antes de validar e comparar | Enunciado |
-| Nascimento: data válida anterior a hoje; gravada como aaaa-mm-dd e exibida como dd/mm/aaaa | Enunciado |
-| Idade e categoria são sempre calculadas, nunca digitadas nem gravadas | Enunciado |
-| Resumo (total, 5 km, 10 km) sempre derivado da lista, inclusive quando zerado | Enunciado |
+|-------|-------|
+| Data da prova: **14/03/2027**, definida uma única vez em `SubscriptionRules.RACE_DATE` | Regulamento, Art. 5º I |
+| Idade **completa na data da prova** (`Period.between`), não a idade de hoje nem a diferença entre os anos. Aniversário no dia da prova já conta | Regulamento, Art. 6º I; enunciado |
+| Idade mínima de 14 anos, verificada **antes** da restrição de percurso | Regulamento, Art. 6º II; enunciado |
+| 10 km somente a partir de 18 anos | Regulamento, Art. 6º III |
+| Categorias: Juvenil 14–17, Adulto 18–39, Master 40–59, Sênior 60+ | Regulamento, Art. 6º IV |
+| Um e-mail, uma inscrição ativa; o e-mail identifica a inscrição | Regulamento, Art. 4º II |
+| E-mail normalizado (espaços nas pontas removidos e minúsculas): `" Ana.Souza@Email.COM "` e `"ana.souza@email.com"` são a mesma inscrição | Enunciado |
+| Nome com 3 a 100 caracteres após remover espaços nas pontas e reduzir espaços repetidos; aceita acentos, apóstrofos e hífens | Enunciado |
+| Edição altera nome, nascimento e percurso; o e-mail é imutável | Pacote do cliente (atualização de 19/10); enunciado |
+| Cancelamento libera o e-mail para nova inscrição | Regulamento, Art. 7º II |
 
 ## Conflitos e decisões
 
-**1. Data da prova: dia 13 ou 14 de março?**
-O áudio do Seu Jorge diz "domingo, dia 13 de março". O regulamento (Art. 5º, I) diz "domingo, 14 de março de 2027".
-**Decisão:** 14/03/2027. O regulamento prevalece, e 13/03/2027 cai num sábado, enquanto 14/03/2027 é domingo, o que confirma o regulamento. A data está definida num único lugar (`DATA_PROVA` em `src/app/dominio/inscricao.regras.ts`).
+| Situação | Decisão | Motivo |
+|----------|---------|--------|
+| O áudio diz "domingo, dia 13 de março"; o regulamento diz 14/03/2027 | 14/03/2027 | O regulamento prevalece sobre áudio e mensagens |
+| O tesoureiro sugere categoria pelo **ano** de nascimento | Não adotado: vale a idade completa na data da prova | Art. 6º I; o enunciado proíbe usar só a diferença entre os anos |
+| Dona Marta quer inscrever a si e aos dois filhos no mesmo e-mail | A segunda inscrição com o mesmo e-mail é recusada (409); a filha de 12 anos é recusada pela idade (400) | Art. 4º I (inscrição individual), Art. 4º II e Art. 6º II |
+| `joao.silva@gmail.com` × `joaosilva@gmail.com` | São inscrições diferentes | A normalização definida no enunciado é apenas espaços e caixa; regras específicas de provedores não fazem parte do escopo |
+| Trocar o e-mail de uma inscrição | Não é permitido na edição: cancelar e inscrever de novo | Pedido do cliente (atualização de 19/10) |
+| Ordem das validações no cadastro | Dados e regulamento primeiro, duplicidade depois | Um pedido inválido recebe 400; o 409 indica um pedido válido que conflita com uma inscrição existente |
+| `PUT` para e-mail inexistente com corpo inválido | Responde 400 | A validação do corpo (`@Valid`) ocorre antes da busca pela inscrição |
+| Nome com números | Recusado | O enunciado lista acentos, apóstrofos e hífens como caracteres especiais aceitos |
+| Formato do e-mail | Exige pelo menos 2 caracteres antes e depois do `@` e terminação com letras (ex.: `.com`, `.com.br`) | Barra erros de digitação comuns, como `ana@email` |
+| Armazenamento | Em memória (`LinkedHashMap`, com o e-mail normalizado como chave) | Permitido pelo enunciado; mantém a ordem de cadastro, a posição na edição e a unicidade do e-mail |
+| Resumo | Calculado a partir da lista a cada consulta, sem contadores separados | Mantém os totais sempre coerentes com a lista, inclusive após edições e quando zerados |
+| Versão do framework | Spring Boot 4 | O enunciado indica Spring Boot 3 como preferência, não como obrigação |
+| Idioma do código | Classes e campos em inglês; nomes do JSON em português via `@JsonProperty`; valores do contrato (`KM_5`, `JUVENIL`...) preservados | Consistência no código e fidelidade ao contrato |
 
-**2. Categoria pelo ano de nascimento (sugestão do Valdir)**
-O Valdir sugere que "nasceu em 87, em 2027 é master".
-**Decisão:** a categoria segue a idade completa na data da prova (Art. 6º, I). Exemplo: quem nasceu em 15/03/1987 tem 39 anos em 14/03/2027 e é Adulto, não Master.
+## Fora do escopo
 
-**3. Dona Marta inscrevendo três pessoas num só e-mail**
-Ela quer inscrever a si mesma e os filhos Pedro (15) e Júlia (12) com `marta.lima@email.com`.
-**Decisão:** não é permitido. A inscrição é individual e cada e-mail identifica uma única inscrição (Art. 4º, I e II). Além disso, a Júlia não atinge a idade mínima de 14 anos (Art. 6º, II) e seria recusada de qualquer forma. O Pedro pode se inscrever com um e-mail próprio, como Juvenil e apenas nos 5 km.
+Não implementados por não fazerem parte do enunciado:
 
-**4. `joao.silva@gmail.com` e `joaosilva@gmail.com` são a mesma pessoa?**
-O Gmail ignora pontos no nome do usuário, então os dois endereços chegam à mesma caixa.
-**Decisão:** são tratados como e-mails diferentes. A normalização exigida é só remover espaços das pontas e converter para minúsculas. Remover pontos é uma regra específica do Gmail; aplicá-la a todos os provedores juntaria endereços que, em outros provedores, pertencem a pessoas diferentes.
+- Pagamento e geração de Pix (a inscrição é gratuita, mediante doação de 1 kg de alimento — Art. 4º III)
+- Envio de e-mail de confirmação
+- Login e autorização
+- Autorização de responsáveis para menores
+- Bloqueio de inscrições ou cancelamentos por data
+- Persistência após reiniciar a aplicação
+- Integração com o front-end
 
-**5. Pix da inscrição**
-O áudio pede para "gerar o Pix da inscrição", mas o regulamento diz que a inscrição é gratuita, mediante doação de alimento (Art. 4º, III).
-**Decisão:** não há cobrança no sistema. Ver "Fora de escopo".
+## Estrutura do projeto
 
-## Perguntas ao cliente
+```
+src/main/java/com/example/backend/
+├── controller/   SubscriptionsController — rotas HTTP
+├── service/      SubscriptionsService — fluxo de cada operação e validações
+├── domain/       SubscriptionRules — regulamento e normalização (Java puro, sem Spring)
+│                 Subscriptions, Length, Categories, SubscriptionEval, RegulamentException
+├── repository/   SubscriptionsRepository — armazenamento em memória
+├── dto/          formatos de entrada e saída do JSON
+└── exception/    exceções de negócio e GlobalExceptionHandler (@RestControllerAdvice)
+```
 
-1. A data da prova é mesmo 14/03/2027 (domingo), como no regulamento? O áudio menciona dia 13.
-2. Como inscrever menores que ainda não têm e-mail próprio, como os filhos da Dona Marta?
-3. Inscrições de menores precisam de autorização dos responsáveis? Se sim, como ela deve ser registrada?
-4. Podemos considerar `joao.silva@gmail.com` e `joaosilva@gmail.com` como inscrições diferentes?
-5. Existe limite de vagas por percurso?
-6. A doação de 1 kg de alimento precisa ser registrada no sistema, ou é controlada só na retirada do kit?
-7. O sistema deve impedir inscrições ou cancelamentos depois de alguma data (por exemplo, a partir do dia da prova)?
+## Tecnologias
 
-## Fora de escopo
+- Java 21
+- Spring Boot 4 (Web MVC e Validation)
+- Maven (via Maven Wrapper)
 
-| Pedido | Motivo |
-|---|---|
-| Gerar Pix da inscrição | A inscrição é gratuita (Art. 4º, III); pagamento está fora do escopo do teste |
-| E-mail de confirmação | Fora do escopo definido no pacote do cliente |
-| Login | Fora do escopo definido no pacote do cliente |
-| Autorização de responsáveis para menores | Fora do escopo definido no pacote do cliente |
-| Bloqueio temporal de inscrições e cancelamentos | Fora do escopo definido no pacote do cliente |
-| Backend e banco de dados | O front-end é independente do teste de backend; os dados ficam no `localStorage` |
-| Sincronização entre abas do navegador | Não é obrigatória, conforme o enunciado |
-| Mais de uma inscrição por e-mail | Contraria o Art. 4º, II |
-
-## Verificações realizadas
-
-- **Regras de idade nas bordas** (`avaliarInscricao`, prova em 14/03/2027):
-
-  | Nascimento | Percurso | Resultado |
-  |---|---|---|
-  | 14/03/2013 | 5 km | 14 anos, Juvenil, aceita |
-  | 15/03/2013 | 5 km | 13 anos, recusada (`IDADE_MINIMA`) |
-  | 01/01/2015 | 10 km | 12 anos, recusada por `IDADE_MINIMA` (não pela distância) |
-  | 14/03/2009 | 10 km | 18 anos no dia, Adulto, aceita |
-  | 15/03/2009 | 10 km | 17 anos, recusada (`DISTANCIA_NAO_PERMITIDA`) |
-  | 15/03/2009 | 5 km | 17 anos, Juvenil, aceita |
-  | 15/03/1987 / 14/03/1987 | 5 km | 39 → Adulto / 40 → Master |
-  | 15/03/1967 / 14/03/1967 | 10 km | 59 → Master / 60 → Sênior |
-
-- **Validações de formato:** nome com 2, 3, 100 e 101 caracteres; nome com espaços repetidos; nome com acento, apóstrofo e hífen; e-mail com espaços e maiúsculas; e-mail sem `@` e sem domínio; data inexistente (30/02); data de hoje e de amanhã; 29/02 em ano bissexto; percurso vazio.
-- **E-mail na URL:** `ana.souza+corrida@email.com` gera `/inscricoes/ana.souza%2Bcorrida@email.com` e é lido de volta sem perder o `+` nem o `@`, inclusive quando colado na barra com o `+` sem codificação.
-- **Compilação:** sem erros de TypeScript nem de template (modo `strictTemplates`).
-- **Layout:** sem rolagem horizontal em 375 px (celular), 768 px (tablet) e 1366 px (desktop), com e sem o formulário aberto.
+### Observação sobre tecnologias:
+Foi mencionado o uso **preferencial** do Spring Boot 3, após uma pesquisa a conclusão chegada foi que o Spring Boot 3 e 4 possuem poucas diferenças e que não haveria impacto direto no projeto.
