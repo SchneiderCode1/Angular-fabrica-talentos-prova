@@ -2,7 +2,7 @@ package com.example.backend.domain;
 
 public enum RegulamentException {
     MIN_AGE(
-        "A idade mínima é: " + SubscriptionRules.MIN_AGE + " anos."
+        "A idade mínima para participar é: " + SubscriptionRules.MIN_AGE + " anos."
     ),
     DISTANCE_NOT_PERMITED(
         "A idade mínima para participar da corrida de 10km é: " + SubscriptionRules.MIN_AGE_10KM + " anos."
@@ -14,8 +14,8 @@ public enum RegulamentException {
         this.message = message;
     };
 
-    public String getMessage() { 
+    public String getMessage() {
         return message;
     };
-    
+
 };

@@ -19,7 +19,7 @@ import com.example.backend.exception.SubscriptionNotFoundException;
 import com.example.backend.exception.SubscriptionNotValidException;
 import com.example.backend.repository.SubscriptionsRepository;
 
-@Service 
+@Service
 public class SubscriptionsService {
 
     private static final int MIN_NAME_LENGTH = 3;
@@ -62,7 +62,7 @@ public class SubscriptionsService {
 
     public ShortResponse summary() {
         List<Subscriptions> subscriptions = repository.list();
-        long km5 = subscriptions.stream().filter(s -> s.length() == Length.KM_05).count();
+        long km5 = subscriptions.stream().filter(s -> s.length() == Length.KM_5).count();
         long km10 = subscriptions.stream().filter(s -> s.length() == Length.KM_10).count();
         return new ShortResponse(subscriptions.size(), km5, km10);
     }
@@ -99,7 +99,7 @@ public class SubscriptionsService {
                 "O nome deve conter apenas letras.");
         }
         return name;
-    }   
+    }
 
     private String validateEmail (String curr_email) {
         String email = SubscriptionRules.normalizeEmail(curr_email);
@@ -108,7 +108,7 @@ public class SubscriptionsService {
                 "O formato de email está incorreto, tente novamente.");
         }
         return email;
-    }   
+    }
 
     private void validateRegulament(LocalDate birthDate, Length length) {
         SubscriptionEval eval = SubscriptionRules.eval(birthDate, length, SubscriptionRules.RACE_DATE);

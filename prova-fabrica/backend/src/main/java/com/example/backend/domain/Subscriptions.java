@@ -8,5 +8,5 @@ public record Subscriptions(
     LocalDate birthDate,
     Length length
 ) {
-    
+
 }

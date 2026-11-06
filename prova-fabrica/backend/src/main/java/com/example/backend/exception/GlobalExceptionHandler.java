@@ -15,13 +15,13 @@ import com.example.backend.dto.ExceptionResponse;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
+    
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
-
+    
     @ExceptionHandler(SubscriptionNotFoundException.class)
     public ResponseEntity<ExceptionResponse> handleNotFound(SubscriptionNotFoundException ex) {
         return respond(HttpStatus.NOT_FOUND, ex.getMessage());
-    }
+    }   
 
     @ExceptionHandler(SubscriptionEmailAlreadyExistsException.class)
     public ResponseEntity<ExceptionResponse> handleEmailAlreadyExists(SubscriptionEmailAlreadyExistsException ex) {
@@ -42,8 +42,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ExceptionResponse> handleUnreadableBody(HttpMessageNotReadableException ex) {
-        return respond(HttpStatus.BAD_REQUEST,
-                "Corpo da requisição inválido. Verifique o JSON, a data no formato aaaa-mm-dd "
+        return respond(HttpStatus.BAD_REQUEST, //400
+                "Corpo da requisição inválido. Código 400. Verifique o JSON, a data no formato aaaa-mm-dd "
                         + "e o percurso (KM_5 ou KM_10).");
     }
 
@@ -54,9 +54,9 @@ public class GlobalExceptionHandler {
                     .body(new ExceptionResponse("Requisição não suportada por esta API."));
         }
         log.error("Erro inesperado", ex);
-        return respond(HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno. Tente novamente mais tarde.");
+        return respond(HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno. Código 500. Tente novamente mais tarde.");
     }
-
+    
     private ResponseEntity<ExceptionResponse> respond(HttpStatus status, String message) {
         return ResponseEntity.status(status).body(new ExceptionResponse(message));
     }

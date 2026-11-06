@@ -12,21 +12,18 @@ public final class SubscriptionRules {
 
     public static final LocalDate RACE_DATE = LocalDate.of(2027, 3, 14);
 
-    public static final int MIN_AGE = 14;
-    public static final int MIN_AGE_10KM = 18;
+    public static final int MIN_AGE = 14; //Juvenil
 
-    private static final int MIN_AGE_MASTER = 40;
-    private static final int MIN_AGE_SENIOR = 60;
+    public static final int MIN_AGE_10KM = 18; //adulto
 
-    private String SubscriptionRule() {
-        return "funcção de inscrição";
-    };
+    private static final int MIN_AGE_MASTER = 40; //master
+    private static final int MIN_AGE_SENIOR = 60; //senior
 
-    public static String normalizeName(String email) {
+    public static String normalizeEmail(String email) {
         return email.trim().toLowerCase(Locale.ROOT);
     }
 
-    public static String normalizeEmail(String name) {
+    public static String normalizeName(String name) {
         return name.trim().replaceAll("\\s+", " ");
     }
 
@@ -55,7 +52,7 @@ public final class SubscriptionRules {
         int age = calculateAge(birth, race_date);
 
         if (age < MIN_AGE) {
-            return SubscriptionEval.refused(age, RegulamentException.MIN_AGE); 
+            return SubscriptionEval.refused(age, RegulamentException.MIN_AGE);
         };
 
         if (length == Length.KM_10 && age < MIN_AGE_10KM) {
@@ -64,7 +61,7 @@ public final class SubscriptionRules {
 
         return SubscriptionEval.accepted(age, getCategorie(age));
     }
-    
-    
+
+
 
 }

@@ -1,6 +1,6 @@
 package com.example.backend.domain;
 
 public enum Length {
-    KM_05,
+    KM_5,
     KM_10
 };

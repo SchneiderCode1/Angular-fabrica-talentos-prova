@@ -32,12 +32,12 @@ public class SubscriptionsController {
         this.service = service;
     }
 
-    @PostMapping
+    @PostMapping("/registrar")
     public ResponseEntity<SubscriptionResponse> register(@Valid @RequestBody SubscriptionRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.register(request));
     }
 
-    @GetMapping
+    @GetMapping("/listar")
     public List<SubscriptionResponse> list() {
         return service.list();
     }
